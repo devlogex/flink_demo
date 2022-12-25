@@ -50,6 +50,11 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
+    healthcheck:
+      test: ["CMD", "bash", "-c", "unset" , "JMX_PORT" ,";" ,"/opt/bitnami/kafka/bin/kafka-topics.sh","--zookeeper","zookeeper:2181","--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   redpanda-console:
     image: docker.redpanda.com/vectorized/console:latest
@@ -58,4 +63,5 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
